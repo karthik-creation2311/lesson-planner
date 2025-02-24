@@ -1,8 +1,6 @@
 import { useState, } from "react";
 import axios from "axios";
-import {useReactToPrint} from "react-to-print";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -23,7 +21,6 @@ function LessonPlanner() {
         materials: "",
         objectives: "",
     });
-    const [extractedData, setExtractedData] = useState({});
     const [generatedLesson, setGeneratedLesson] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -66,7 +63,6 @@ function LessonPlanner() {
 
             const lessonText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
             setGeneratedLesson(lessonText);
-            setExtractedData(parseMarkdownLessonPlan(lessonText));
         } catch (err) {
             setError("Failed to generate lesson. Please try again.");
         }
@@ -74,175 +70,10 @@ function LessonPlanner() {
         setLoading(false);
     };
 
-    //  Function to handle PDF generation
-    // const printRef = useRef();
-    // const handlePrint = useReactToPrint({
-    //     content: () => printRef.current,
-    //     documentTitle: "Lesson Plan",
-    // });
-
-
-    //
-    // const downloadPDF = () => {
-    //     const doc = new jsPDF();
-    //
-    //     doc.setFont("helvetica", "bold");
-    //     doc.setFontSize(16);
-    //     doc.text("Lesson Plan", 105, 15, { align: "center" });
-    //
-    //     doc.setFontSize(12);
-    //     doc.setFont("helvetica", "normal");
-    //
-    //     // Extracting Lesson Data (Assuming this is parsed from API)
-    //     const lessonData = {
-    //         topic: "HTML Tables",
-    //         gradeLevel: "6",
-    //         mainConcept: "Creating and styling HTML tables",
-    //         subtopics: "<table>, <tr>, <td>, <th>, border, height, table design using attributes and simple CSS",
-    //         materials: "PDFs (examples of HTML code with tables, instructions for activities), computer lab, projector",
-    //         objectives: [
-    //             "Understand the basic structure of an HTML table.",
-    //             "Create a simple HTML table using <table>, <tr>, <td>, and <th> tags.",
-    //             "Adjust table appearance using border and height attributes.",
-    //             "Apply knowledge to create a basic HTML table."
-    //         ],
-    //         outline: [
-    //             ["15 min", "Introduction", "Show real-world examples"],
-    //             ["20 min", "Basic Table Structure", "Walk through example code"],
-    //             ["20 min", "Table Styling", "Add borders and heights"],
-    //             ["15 min", "Advanced Table Design", "Introduce CSS styling"],
-    //             ["10 min", "Assessment", "Review key concepts"]
-    //         ],
-    //         assessment: [
-    //             "Write the HTML code to create a table with two rows and three columns.",
-    //             "How do you add a border to an HTML table? Provide an example.",
-    //             "What is the purpose of the <th> tag?",
-    //             "What is one way to make your table visually appealing?",
-    //             "Explain how using CSS improves table design."
-    //         ]
-    //     };
-    //
-    //     // Function to add section headers
-    //     const addSection = (title, content, yPos) => {
-    //         doc.setFont("helvetica", "bold");
-    //         doc.text(title, 15, yPos);
-    //         doc.setFont("helvetica", "normal");
-    //         const splitContent = doc.splitTextToSize(content, 180);
-    //         doc.text(splitContent, 15, yPos + 6);
-    //         return yPos + 10 + (splitContent.length * 6);
-    //     };
-    //
-    //     let y = 25;
-    //     y = addSection("Topic:", lessonData.topic, y);
-    //     y = addSection("Grade Level:", lessonData.gradeLevel, y);
-    //     y = addSection("Main Concept:", lessonData.mainConcept, y);
-    //     y = addSection("Subtopics:", lessonData.subtopics, y);
-    //     y = addSection("Materials Needed:", lessonData.materials, y);
-    //
-    //     // Learning Objectives
-    //     doc.setFont("helvetica", "bold");
-    //     doc.text("Learning Objectives:", 15, y);
-    //     doc.setFont("helvetica", "normal");
-    //     lessonData.objectives.forEach((obj, index) => {
-    //         doc.text(`- ${obj}`, 15, y + (index + 1) * 6);
-    //     });
-    //     y += lessonData.objectives.length * 6 + 10;
-    //
-    //     // Lesson Outline as a Table
-    //     doc.setFont("helvetica", "bold");
-    //     doc.text("Lesson Outline:", 15, y);
-    //     doc.setFont("helvetica", "normal");
-    //
-    //     autoTable(doc, {
-    //         startY: y + 5,
-    //         head: [["Duration", "Guide", "Remarks"]],
-    //         body: lessonData.outline,
-    //         theme: "grid",
-    //         styles: { fontSize: 10 },
-    //     });
-    //
-    //     let yAfterTable = doc.lastAutoTable.finalY + 10;
-    //
-    //     // Assessment Questions
-    //     doc.setFont("helvetica", "bold");
-    //     doc.text("Assessment Questions:", 15, yAfterTable);
-    //     doc.setFont("helvetica", "normal");
-    //
-    //     lessonData.assessment.forEach((question, index) => {
-    //         doc.text(`${index + 1}. ${question}`, 15, yAfterTable + (index + 1) * 6);
-    //     });
-    //
-    //     // Save PDF
-    //     doc.save(`${lessonData.topic}_LessonPlan.pdf`);
-    // };
-
-
-    // Function to extract key data from AI response
-    // const extractLessonData = (text) => {
-    //     const extractSection = (label) => {
-    //         const regex = new RegExp(`${label}:\\s*([^\\n]+)`, "i");
-    //         const match = text.match(regex);
-    //         return match ? match[1].trim() : "Not Provided";
-    //     };
-    //
-    //     return {
-    //         topic: extractSection("Topic"),
-    //         gradeLevel: extractSection("Grade Level"),
-    //         mainConcept: extractSection("Main Concept"),
-    //         subtopics: extractSection("Subtopics"),
-    //         materials: extractSection("Materials Needed"),
-    //         objectives: extractSection("Learning Objectives"),
-    //         lessonOutline: extractSection("Lesson Outline"),
-    //         assessment: extractSection("Assessment Questions"),
-    //     };
-    // };
-    const parseMarkdownLessonPlan = (markdown) => {
-        // Convert Markdown to plain text
-        const plainText = markdown
-            .replace(/\*\*(.*?)\*\*/g, "$1")  // Bold
-            .replace(/\*(.*?)\*/g, "$1")      // Italic
-            .replace(/`(.*?)`/g, "$1")        // Inline code
-            .replace(/###?\s?(.*?)/g, "$1")   // Headers
-            .replace(/-\s(.*?)/g, "$1")       // Bullets
-            .trim();
-
-        const lessonData = {};
-
-        // Regular expressions to capture the required fields
-        const regexPatterns = {
-            topic: /Topic:\s*(.+)/,
-            gradeLevel: /Grade Level:\s*(.+)/,
-            mainConcept: /Main Concept:\s*(.+)/,
-            subtopics: /Subtopics:\s*(.+)/,
-            materials: /Materials Needed:\s*(.+)/,
-            objectives: /Learning Objectives:\s*([\s\S]+?)(?=\n\nLesson Outline)/ // Capture multi-line objectives
-        };
-
-        // Apply regex patterns
-        for (const key in regexPatterns) {
-            const match = plainText.match(regexPatterns[key]);
-            lessonData[key] = match ? match[1].trim() : "N/A";
-        }
-
-        // Convert bullet points in Learning Objectives to an array
-        if (lessonData.objectives !== "N/A") {
-            lessonData.objectives = lessonData.objectives
-                .split("\n")
-                .map(line => line.replace(/^\*\s*/, "").trim()) // Remove "* " from each point
-                .filter(line => line.length > 0); // Remove empty lines
-        }
-
-        return lessonData;
-    };
-
-
-
-
     const downloadPDF = () => {
-        console.log(extractedData);
-        const doc = new jsPDF();
+        if (!generatedLesson) return;
 
-        // Set title
+        const doc = new jsPDF();
         doc.setFont("helvetica", "bold");
         doc.setFontSize(16);
         doc.text("Lesson Plan", 105, 15, { align: "center" });
@@ -250,41 +81,31 @@ function LessonPlanner() {
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
 
-        // Function to add sections
-        const addSection = (title, content, yPos) => {
-            if (!content || content === "N/A") return yPos; // Skip empty sections
+        const markdownText = generatedLesson.replace(/\*\*(.*?)\*\*/g, "$1"); // Remove markdown bold
 
-            doc.setFont("helvetica", "bold");
-            doc.text(title, 15, yPos);
-            doc.setFont("helvetica", "normal");
-
-            const splitContent = doc.splitTextToSize(content, 180);
-            doc.text(splitContent, 15, yPos + 6);
-            return yPos + 10 + splitContent.length * 6;
-        };
-
+        // Convert Markdown content into PDF sections
+        const sections = markdownText.split("\n\n"); // Split into paragraphs
         let y = 25;
-        y = addSection("Topic:", extractedData.topic, y);
-        y = addSection("Grade Level:", extractedData.gradeLevel, y);
-        y = addSection("Main Concept:", extractedData.mainConcept, y);
-        y = addSection("Subtopics:", extractedData.subtopics, y);
-        y = addSection("Materials Needed:", extractedData.materials, y);
 
-        // Learning Objectives (as bullet points)
-        if (extractedData.objectives.length > 0) {
-            doc.setFont("helvetica", "bold");
-            doc.text("Learning Objectives:", 15, y);
-            doc.setFont("helvetica", "normal");
+        sections.forEach((section) => {
+            if (section.startsWith("-")) {
+                // Bullet points handling
+                const bullets = section.split("\n");
+                bullets.forEach((bullet, index) => {
+                    doc.text(`• ${bullet.replace(/^- /, "")}`, 15, y + index * 6);
+                });
+                y += bullets.length * 6 + 5;
+            } else {
+                // Normal text (headers or paragraphs)
+                const wrappedText = doc.splitTextToSize(section, 180);
+                doc.text(wrappedText, 15, y);
+                y += wrappedText.length * 6 + 5;
+            }
+        });
 
-            extractedData.objectives.forEach((objective, index) => {
-                doc.text(`• ${objective}`, 20, y + (index + 1) * 6);
-            });
-
-            y += extractedData.objectives.length * 6 + 10;
-        }
-
-        doc.save(`${extractedData.topic}_LessonPlan.pdf`);
+        doc.save(`${lessonData.topic || "LessonPlan"}.pdf`);
     };
+
 
 
 

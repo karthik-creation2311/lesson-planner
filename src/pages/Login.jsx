@@ -50,7 +50,7 @@ function Login() {
                     {/*>*/}
                     {/*    Login*/}
                     {/*</button>*/}
-                    <Button type="submit" className="w-full p-2">Login</Button>
+                    <Button type="submit" className="w-full p-2 bg-green-500">Login</Button>
                 </form>
             </div>
         </div>

@@ -2,9 +2,6 @@
 
 An AI-powered lesson planner built with **React.js, ShadCN UI, Google Gemini API, and PDF export functionality**.
 
-## 🚀 Live Demo
-[View Deployed App](https://your-app-url.com/) (Replace with actual deployment URL)
-
 ---
 
 ## 📌 Table of Contents
